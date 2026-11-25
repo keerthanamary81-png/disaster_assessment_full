@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Upload Image - DisasterAI{% endblock %}
+{% block page_title %}Upload & Analyse Disaster Image{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-cloud-upload me-2"></i>New Damage Assessment
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="uploadForm">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Disaster Image (JPG / PNG, max 10 MB)</label>
+                        <div class="upload-zone" id="uploadZone">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                            <p class="mt-2 mb-1 fw-semibold">Drag & drop image here or click to browse</p>
+                            <p class="text-muted small mb-0">Supported: Flood, Cyclone, Storm affected areas</p>
+                        </div>
+                        {{ form.image }}
+                        {% if form.image.errors %}
+                        <div class="text-danger small mt-1">{{ form.image.errors }}</div>
+                        {% endif %}
+                        <div id="imagePreview" class="mt-3 d-none text-center">
+                            <img id="previewImg" src="" class="img-fluid rounded" style="max-height:220px;" alt="Preview">
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Disaster Type</label>
+                            {{ form.disaster_type }}
+                            {% if form.disaster_type.errors %}<div class="text-danger small">{{ form.disaster_type.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Date of Incident</label>
+                            {{ form.date_of_incident }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Affected Location</label>
+                            {{ form.location }}
+                            {% if form.location.errors %}<div class="text-danger small">{{ form.location.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Description (Optional)</label>
+                            {{ form.description }}
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-4 small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        The AI will analyse visible damage such as fallen trees, structural damage indicators and flooded areas.
+                        Results are preliminary and require professional verification.
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                        <a href="{% url 'dashboard:home' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4" id="submitBtn">
+                            <i class="bi bi-cpu me-1"></i> Analyse with AI
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('uploadForm').addEventListener('submit', function() {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Analysing...';
+});
+// Hide the default file input styling
+document.getElementById('id_image').style.display = 'none';
+</script>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Admin Panel{% endblock %}
+{% block page_title %}Admin Panel{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="text-muted small">Registered Users</div>
+                <div class="fs-3 fw-bold text-primary">{{ total_users }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="text-muted small">Total Assessments</div>
+                <div class="fs-3 fw-bold text-success">{{ total_assessments }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="text-muted small">Categories Tracked</div>
+                <div class="fs-3 fw-bold text-info">{{ cat_stats|length }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">Recent Users</div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-hover mb-0">
+                    <thead><tr><th>User</th><th>Email</th><th>Joined</th></tr></thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td>{{ u.username }}</td>
+                            <td>{{ u.email }}</td>
+                            <td>{{ u.date_joined|date:"d M Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">Category Statistics</div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-hover mb-0">
+                    <thead><tr><th>Category</th><th>Count</th></tr></thead>
+                    <tbody>
+                        {% for c in cat_stats %}
+                        <tr>
+                            <td>{{ c.category|title }}</td>
+                            <td>{{ c.count }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="2" class="text-muted text-center">No data</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">Latest Assessments (All Users)</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr><th>ID</th><th>User</th><th>Location</th><th>Severity</th><th>Date</th></tr>
+            </thead>
+            <tbody>
+                {% for a in assessments %}
+                <tr>
+                    <td>#{{ a.id }}</td>
+                    <td>{{ a.image.user.username }}</td>
+                    <td>{{ a.image.location|truncatechars:30 }}</td>
+                    <td><span class="badge badge-severity-{{ a.overall_severity }} text-white">{{ a.get_overall_severity_display }}</span></td>
+                    <td>{{ a.created_at|date:"d M Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

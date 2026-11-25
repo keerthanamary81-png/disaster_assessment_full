@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Register - DisasterAI{% endblock %}
+
+{% block public_content %}
+<div class="auth-wrapper">
+    <div class="auth-card card" style="max-width:460px;">
+        <div class="card-header">
+            <h4 class="mb-0 text-primary fw-bold">Create Account</h4>
+            <small class="text-muted">Join the disaster assessment platform</small>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" required value="{{ form.username.value|default:'' }}">
+                    {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" required value="{{ form.email.value|default:'' }}">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password1" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Confirm</label>
+                        <input type="password" name="password2" class="form-control" required>
+                    </div>
+                </div>
+                {% if form.password1.errors or form.password2.errors %}
+                <div class="text-danger small mb-2">{{ form.password1.errors.0 }}{{ form.password2.errors.0 }}</div>
+                {% endif %}
+                <div class="mb-3">
+                    <label class="form-label">Phone (optional)</label>
+                    <input type="text" name="phone" class="form-control" value="{{ form.phone.value|default:'' }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Organization (optional)</label>
+                    <input type="text" name="organization" class="form-control" value="{{ form.organization.value|default:'' }}">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Register</button>
+            </form>
+            <p class="text-center mt-3 mb-0 small">
+                Already have an account? <a href="{% url 'accounts:login' %}">Login</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

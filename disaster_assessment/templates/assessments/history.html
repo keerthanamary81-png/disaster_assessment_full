@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Assessment History{% endblock %}
+{% block page_title %}Assessment History{% endblock %}
+
+{% block content %}
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small">Disaster Type</label>
+                <select name="disaster_type" class="form-select form-select-sm">
+                    <option value="">All</option>
+                    <option value="flood" {% if filters.disaster_type == 'flood' %}selected{% endif %}>Flood</option>
+                    <option value="cyclone" {% if filters.disaster_type == 'cyclone' %}selected{% endif %}>Cyclone</option>
+                    <option value="storm" {% if filters.disaster_type == 'storm' %}selected{% endif %}>Storm</option>
+                    <option value="earthquake" {% if filters.disaster_type == 'earthquake' %}selected{% endif %}>Earthquake</option>
+                    <option value="other" {% if filters.disaster_type == 'other' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Location</label>
+                <input type="text" name="location" class="form-control form-control-sm" value="{{ filters.location }}" placeholder="Search location">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">From</label>
+                <input type="date" name="date_from" class="form-control form-control-sm" value="{{ filters.date_from }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">To</label>
+                <input type="date" name="date_to" class="form-control form-control-sm" value="{{ filters.date_to }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-funnel me-1"></i>Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Location</th>
+                        <th>Type</th>
+                        <th>Severity</th>
+                        <th>Detections</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in assessments %}
+                    <tr>
+                        <td>#{{ a.id }}</td>
+                        <td>{{ a.image.location }}</td>
+                        <td><span class="badge bg-primary-subtle text-primary">{{ a.image.get_disaster_type_display }}</span></td>
+                        <td><span class="badge badge-severity-{{ a.overall_severity }} text-white">{{ a.get_overall_severity_display }}</span></td>
+                        <td>{{ a.total_detections }}</td>
+                        <td>{{ a.created_at|date:"d M Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'assessments:result' a.pk %}" class="btn btn-sm btn-outline-primary" title="View"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'assessments:download_report' a.pk %}" class="btn btn-sm btn-outline-success" title="PDF"><i class="bi bi-file-pdf"></i></a>
+                            <a href="{% url 'assessments:delete' a.pk %}" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted py-5">No assessments found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

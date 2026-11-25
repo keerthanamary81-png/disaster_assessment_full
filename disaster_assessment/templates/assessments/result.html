@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Assessment Result #{{ assessment.id }}{% endblock %}
+{% block page_title %}Assessment Result{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+        <h5 class="mb-0 text-primary">Assessment #{{ assessment.id }}</h5>
+        <small class="text-muted">{{ assessment.created_at|date:"d M Y, H:i" }} · {{ assessment.processing_time }}s processing</small>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'assessments:download_report' assessment.pk %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF Report
+        </a>
+        <a href="{% url 'assessments:history' %}" class="btn btn-outline-secondary btn-sm">History</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="text-muted small">Disaster Type</div>
+            <div class="fw-bold">{{ image.get_disaster_type_display }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="text-muted small">Location</div>
+            <div class="fw-bold">{{ image.location|truncatechars:20 }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="text-muted small">Severity</div>
+            <div><span class="badge badge-severity-{{ assessment.overall_severity }} text-white fs-6">{{ assessment.get_overall_severity_display }}</span></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="text-muted small">Detections</div>
+            <div class="fw-bold fs-4">{{ assessment.total_detections }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Original Image</div>
+            <div class="card-body p-2 img-compare">
+                <img src="{{ image.image.url }}" alt="Original" class="w-100">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">AI Annotated Image</div>
+            <div class="card-body p-2 img-compare">
+                {% if assessment.analysed_image %}
+                <img src="{{ assessment.analysed_image.url }}" alt="Analysed" class="w-100">
+                {% else %}
+                <div class="text-center text-muted py-5">Annotation not available</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-list-check me-2"></i>Detected Damage Categories</div>
+    <div class="card-body">
+        {% if detections %}
+        <div class="row g-3">
+            {% for d in detections %}
+            <div class="col-md-4">
+                <div class="card detection-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ d.get_category_display }}</strong>
+                            <span class="badge bg-primary">{{ d.confidence_percent }}%</span>
+                        </div>
+                        {% if d.label %}
+                        <small class="text-muted">Label: {{ d.label }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No specific supported damage categories were detected in this image. The model may not have found clear visual indicators of fallen trees, structural damage or flooding.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-card-text me-2"></i>Assessment Summary</div>
+    <div class="card-body">
+        <p class="mb-0">{{ assessment.summary }}</p>
+        {% if image.description %}
+        <hr>
+        <p class="mb-0"><strong>User notes:</strong> {{ image.description }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="alert alert-warning small">
+    <strong><i class="bi bi-exclamation-triangle me-1"></i> Important Disclaimer:</strong>
+    This is a preliminary AI-based visual damage assessment only. It does not confirm the structural safety of any building or infrastructure.
+    Always verify findings with qualified disaster-response professionals and structural engineers before taking action.
+</div>
+{% endblock %}
